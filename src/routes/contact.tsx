@@ -56,7 +56,7 @@ function Contact() {
                 
                 <div className="p-6 bg-gradient-to-r from-yellow-500 to-orange-600 rounded-xl text-black">
                     <h3 className="text-2xl font-black mb-2">BECOME A VENDOR</h3>
-                    <p className="mb-4 font-medium">Showcase your Wakye to thousands of food lovers.</p>
+                    <p className="mb-4 font-medium">Showcase your Waakye to thousands of food lovers.</p>
                     <Button variant="outline" className="w-full bg-black text-white border-0 hover:bg-zinc-800">
                         Apply Now
                     </Button>

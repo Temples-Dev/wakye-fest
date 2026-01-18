@@ -15,7 +15,7 @@ export const TicketView = ({ name, ticketId }: TicketProps) => {
     <div className="relative w-full max-w-sm mx-auto bg-black border-2 border-yellow-500 rounded-3xl overflow-hidden shadow-[0_0_30px_rgba(234,179,8,0.3)] text-white font-mono">
       {/* Header */}
       <div className="bg-gradient-to-r from-yellow-500 to-orange-600 p-6 text-center">
-        <h2 className="text-3xl font-black text-black">WAKYE FEST</h2>
+        <h2 className="text-3xl font-black text-black">WAAKYE FEST</h2>
         <p className="text-black font-bold tracking-widest">2026</p>
       </div>
 

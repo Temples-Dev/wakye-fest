@@ -6,7 +6,7 @@ export default function Header() {
     <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 transition-all duration-300 bg-transparent backdrop-blur-[2px]">
       <div className="flex items-center gap-2">
         <Link to="/" className="text-2xl font-black tracking-tighter text-white">
-          WAKYE<span className="text-yellow-500">FEST</span>
+          WAAKYE<span className="text-yellow-500">FEST</span>
         </Link>
       </div>
       

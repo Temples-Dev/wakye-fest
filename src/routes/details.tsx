@@ -56,7 +56,7 @@ function Details() {
                         <Utensils className="w-8 h-8 text-yellow-500" />
                     </div>
                     <div>
-                        <h3 className="text-xl font-bold text-white mb-2">Unlimited Wakye</h3>
+                        <h3 className="text-xl font-bold text-white mb-2">Unlimited Waakye</h3>
                         <p className="text-gray-400">Taste variations from the best vendors across the Volta Region. Served hot with all the accompaniments.</p>
                     </div>
                 </div>

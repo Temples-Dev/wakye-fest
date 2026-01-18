@@ -30,7 +30,7 @@ const EventHero = () => {
         <div className="animate-fade-in-up">
           <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-6xl md:text-8xl">
             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500 font-display">
-              WAKYE FEST
+              WAAKYE FEST
             </span>
             <span className="block text-2xl sm:text-4xl font-light tracking-widest mt-2 text-gray-300">
               2026
@@ -38,7 +38,7 @@ const EventHero = () => {
           </h1>
           
           <p className="mx-auto mt-6 max-w-lg text-xl text-gray-300 sm:max-w-3xl">
-            Experience the biggest food festival in Ho. Unlimited Wakye, music, and vibes.
+            Experience the biggest food festival in Ho. Unlimited Waakye, music, and vibes.
           </p>
 
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">

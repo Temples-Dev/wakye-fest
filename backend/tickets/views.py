@@ -161,8 +161,17 @@ class CheckInView(APIView):
     
     def post(self, request):
         ticket_id = request.data.get('ticket_id')
+        ticket_code = request.data.get('ticket_code') # For manual entry short code
         qr_content = request.data.get('qr_code_content')
-        ticket_ids = request.data.get('ticket_ids', []) # For bulk check-in via checkbox maybe?
+        ticket_ids = request.data.get('ticket_ids', []) # For bulk check-in via checkbox
+
+        # Resolve short code to ID if provided
+        if ticket_code:
+            try:
+                ticket = Ticket.objects.get(short_code=ticket_code.upper()) # Case insensitive
+                ticket_id = ticket.id
+            except Ticket.DoesNotExist:
+                 return Response({'error': 'Invalid ticket code'}, status=status.HTTP_404_NOT_FOUND)
 
         # Parse QR content if provided (expecting JSON string or raw ID)
         if qr_content:
@@ -184,9 +193,21 @@ class CheckInView(APIView):
              return Response({'error': 'No ticket ID provided'}, status=status.HTTP_400_BAD_REQUEST)
         
         # Process check-ins
-        updated_count = Ticket.objects.filter(id__in=ids_to_process, verified=True).update(checked_in=True)
+        tickets_to_check_in = Ticket.objects.filter(id__in=ids_to_process, verified=True)
+        updated_count = tickets_to_check_in.update(checked_in=True)
         
         if updated_count == 0:
-             return Response({'error': 'No valid verified tickets found for given IDs'}, status=status.HTTP_400_BAD_REQUEST)
-             
-        return Response({'message': f'Successfully checked in {updated_count} tickets.', 'count': updated_count}, status=status.HTTP_200_OK)
+             # Check if ticket exists but not verified vs just doesn't exist/already checked in logic could be better
+             # But for MVP:
+             return Response({'error': 'Ticket invalid or not paid (verified)'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Serialize the checked-in tickets to return details
+        # We re-fetch or reuse queryset (update doesn't invalidate filter if we just want data)
+        # However, update might not reflect in queryset cache if not refreshed usually, but here we just need names
+        attendees = TicketSerializer(tickets_to_check_in, many=True).data
+
+        return Response({
+            'message': f'Successfully checked in.', 
+            'count': updated_count,
+            'attendees': attendees
+        }, status=status.HTTP_200_OK)

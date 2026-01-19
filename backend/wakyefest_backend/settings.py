@@ -81,21 +81,23 @@ DATABASES = {
 
 # CORS Configuration
 
+
 # CORS Configuration
 if DEBUG:
     # Development: Allow specific network origins for local testing
-    CORS_ALLOW_ALL_ORIGINS = True  # Simplify for dev/ngrok usage
-    
-    # Allow Localtunnel for CSRF
-    CSRF_TRUSTED_ORIGINS = [
-        'https://*.loca.lt',
-        'http://localhost:3000',
-        'http://127.0.0.1:3000',
+    CORS_ALLOWED_ORIGINS = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://192.168.0.136:5173",
+        "http://172.18.0.1:5173",
+        "http://172.20.0.1:5173",
+        "http://172.19.0.1:5173",
     ]
 else:
     # Production: Set specific allowed origins via environment variable
     CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',')
     CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',')
+
 
 
 

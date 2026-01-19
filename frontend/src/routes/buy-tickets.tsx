@@ -21,6 +21,7 @@ type Step = 'quantity' | 'details' | 'payment' | 'success'
 interface TicketData {
   id: string
   name: string
+  short_code: string
   type: 'General Admission'
 }
 
@@ -148,6 +149,7 @@ export function BuyTickets() {
              const backendTickets = data.map((t: any) => ({
                  id: t.id,
                  name: t.name,
+                 short_code: t.short_code,
                  type: 'General Admission'
              }))
              
@@ -378,6 +380,7 @@ export function BuyTickets() {
                             <TicketView 
                                 name={ticket.name}
                                 ticketId={ticket.id}
+                                shortCode={ticket.short_code}
                                 type={ticket.type}
                                 eventDetails={eventSettings}
                             />

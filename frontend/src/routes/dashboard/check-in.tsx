@@ -12,11 +12,19 @@ export const Route = createFileRoute('/dashboard/check-in')({
 
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8001'
 
+interface TicketData {
+  id: string
+  name: string
+  short_code: string
+  type?: string
+}
+
 interface CheckInResult {
   success: boolean
   message: string
   ticketId?: string
   timestamp: string
+  attendees?: TicketData[]
 }
 
 function CheckIn() {
@@ -31,25 +39,32 @@ function CheckIn() {
   const lastScanRef = useRef<string>('')
   const scanTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  const handleCheckIn = async (qrContent: string) => {
-    // Prevent duplicate scans within 2 seconds
-    if (lastScanRef.current === qrContent && scanTimeoutRef.current) {
+  const handleCheckIn = async (qrContent: string, isManualCode = false) => {
+    // Prevent duplicate scans within 2 seconds (only for QR)
+    if (!isManualCode && lastScanRef.current === qrContent && scanTimeoutRef.current) {
       return
     }
 
-    lastScanRef.current = qrContent
+    if (!isManualCode) {
+        lastScanRef.current = qrContent
+    }
+    
     setLoading(true)
     setError(null)
 
     try {
       const token = localStorage.getItem('access_token')
+      const body = isManualCode 
+        ? { ticket_code: qrContent } 
+        : { qr_code_content: qrContent }
+
       const res = await fetch(`${apiUrl}/api/check-in/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ qr_code_content: qrContent })
+        body: JSON.stringify(body)
       })
 
       const data = await res.json()
@@ -58,7 +73,8 @@ function CheckIn() {
         success: res.ok,
         message: res.ok ? data.message : data.error || 'Check-in failed',
         ticketId: qrContent,
-        timestamp: new Date().toLocaleTimeString()
+        timestamp: new Date().toLocaleTimeString(),
+        attendees: data.attendees
       }
 
       setLastResult(result)
@@ -67,12 +83,14 @@ function CheckIn() {
         setRecentCheckIns(prev => [result, ...prev].slice(0, 10))
       }
 
-      // Reset last scan after 2 seconds
-      if (scanTimeoutRef.current) clearTimeout(scanTimeoutRef.current)
-      scanTimeoutRef.current = setTimeout(() => {
-        lastScanRef.current = ''
-        scanTimeoutRef.current = null
-      }, 2000)
+      // Reset last scan after 2 seconds (only for QR)
+      if (!isManualCode) {
+          if (scanTimeoutRef.current) clearTimeout(scanTimeoutRef.current)
+          scanTimeoutRef.current = setTimeout(() => {
+            lastScanRef.current = ''
+            scanTimeoutRef.current = null
+          }, 2000)
+      }
 
     } catch (err) {
       console.error('Check-in error:', err)
@@ -82,17 +100,12 @@ function CheckIn() {
     }
   }
 
+
   const startScanner = async () => {
     try {
       setError(null)
       const scanner = new Html5Qrcode('qr-reader')
       scannerRef.current = scanner
-
-      // Check for Secure Context (HTTPS)
-      if (window.isSecureContext === false) {
-        setError('HTTPS required. Camera access is blocked on insecure connections (HTTP). Please access via HTTPS.')
-        return
-      }
 
       // getCameras call and logic below...
 
@@ -161,7 +174,7 @@ function CheckIn() {
     e.preventDefault()
     if (!manualId.trim()) return
     
-    await handleCheckIn(manualId.trim())
+    await handleCheckIn(manualId.trim(), true)
     setManualId('')
   }
 
@@ -249,13 +262,33 @@ function CheckIn() {
                 ? 'bg-green-900/40 border-green-700/50 text-green-400'
                 : 'bg-red-900/40 border-red-700/50 text-red-400'
             }`}>
-              {lastResult.success ? (
-                <CheckCircle className="inline mr-2 h-5 w-5" />
-              ) : (
-                <XCircle className="inline mr-2 h-5 w-5" />
+              <div className="flex items-center mb-2">
+                  {lastResult.success ? (
+                    <CheckCircle className="inline mr-2 h-5 w-5" />
+                  ) : (
+                    <XCircle className="inline mr-2 h-5 w-5" />
+                  )}
+                  <span className="font-semibold text-lg">{lastResult.message}</span>
+                  <span className="text-sm ml-auto opacity-75">({lastResult.timestamp})</span>
+              </div>
+              
+              {/* Display Attendees if available */}
+              {lastResult.success && lastResult.attendees && lastResult.attendees.length > 0 && (
+                  <div className="mt-4 space-y-2 border-t border-green-700/30 pt-4">
+                      <p className="text-sm text-green-300 font-bold uppercase tracking-wider">Attendee Details</p>
+                      {lastResult.attendees.map((attendee) => (
+                          <div key={attendee.id} className="bg-black/30 p-3 rounded-md flex justify-between items-center">
+                                <div>
+                                    <p className="text-white font-bold text-lg">{attendee.name}</p>
+                                    <p className="text-sm text-green-300/70">ID: {attendee.short_code || attendee.id.slice(0,8)}</p>
+                                </div>
+                                <div className="bg-green-500/20 text-green-300 px-2 py-1 rounded text-xs font-bold border border-green-500/30">
+                                    VERIFIED
+                                </div>
+                          </div>
+                      ))}
+                  </div>
               )}
-              <span className="font-semibold">{lastResult.message}</span>
-              <span className="text-sm ml-2 opacity-75">({lastResult.timestamp})</span>
             </div>
           )}
         </CardContent>
@@ -272,7 +305,7 @@ function CheckIn() {
             <Input 
               value={manualId}
               onChange={(e) => setManualId(e.target.value)}
-              placeholder="Enter ticket ID"
+              placeholder="Enter 8-digit code (e.g. AB12CD34)"
               className="bg-white/5 border-white/10 text-white flex-1"
             />
             <Button 

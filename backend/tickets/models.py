@@ -10,9 +10,22 @@ class Ticket(models.Model):
     verified = models.BooleanField(default=False)
     checked_in = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    short_code = models.CharField(max_length=8, unique=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.short_code:
+            import random
+            import string
+            while True:
+                # Generate custom 8-char alphanumeric code (e.g. AB12CD34)
+                code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+                if not Ticket.objects.filter(short_code=code).exists():
+                    self.short_code = code
+                    break
+        super(Ticket, self).save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.name} - {self.id}"
+        return f"{self.name} - {self.short_code}"
 
 class EventSettings(models.Model):
     name = models.CharField(max_length=255, default="Waakye Fest 2026")

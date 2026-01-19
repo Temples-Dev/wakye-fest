@@ -104,16 +104,23 @@ export function DashboardLayout() {
                         <ScanLine size={20} className="group-hover:text-yellow-400 transition-colors" />
                         <span>Check-in</span>
                     </Link>
+                    <Link 
+                        to="/dashboard/attendees" 
+                        className="flex items-center space-x-3 px-4 py-3 rounded-lg text-white transition-all duration-200 group"
+                        activeProps={{
+                            className: "bg-gradient-to-r from-yellow-500/10 to-transparent border-l-2 border-yellow-500 text-yellow-400"
+                        }}
+                        inactiveProps={{
+                            className: "hover:bg-white/5 text-gray-400 hover:text-white"
+                        }}
+                        onClick={closeMobileMenu}
+                    >
+                        <Users size={20} className="group-hover:text-yellow-400 transition-colors" />
+                        <span>Attendees</span>
+                    </Link>
                    
                    {/* Placeholder links for future expansion */}
-                    <div className="flex items-center space-x-3 px-4 py-3 text-gray-600 rounded-lg cursor-not-allowed opacity-50">
-                        <Users size={20} />
-                        <span>Attendees</span>
-                    </div>
-                    <div className="flex items-center space-x-3 px-4 py-3 text-gray-600 rounded-lg cursor-not-allowed opacity-50">
-                        <CreditCard size={20} />
-                        <span>Revenues</span>
-                    </div>
+                   {/* Revenues removed as per request */}
                 </nav>
 
                 <div className="p-4 border-t border-white/10 relative z-10">

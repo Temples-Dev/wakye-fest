@@ -86,9 +86,9 @@ if DEBUG:
     # Development: Allow specific network origins for local testing
     CORS_ALLOW_ALL_ORIGINS = True  # Simplify for dev/ngrok usage
     
-    # Allow Ngrok for CSRF
+    # Allow Localtunnel for CSRF
     CSRF_TRUSTED_ORIGINS = [
-        'https://*.ngrok-free.app',
+        'https://*.loca.lt',
         'http://localhost:3000',
         'http://127.0.0.1:3000',
     ]

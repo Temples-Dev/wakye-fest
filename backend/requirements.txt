@@ -9,3 +9,5 @@ whitenoise
 drf-yasg
 djangorestframework-simplejwt
 django-filter
+dj-database-url
+python-decouple

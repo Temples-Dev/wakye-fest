@@ -6,18 +6,11 @@ services:
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/app
+
     ports:
       - "8001:8000"
-    environment:
-      - DEBUG=1
-      - SECRET_KEY=dev_secret_key
-      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1] 192.168.0.136
-      - DB_ENGINE=django.db.backends.postgresql
-      - DB_NAME=wakyefest
-      - DB_USER=wakyeuser
-      - DB_PASSWORD=wakyepass
-      - DB_HOST=db
-      - DB_PORT=5432
+    env_file:
+      - .env
     depends_on:
       - db
 
@@ -26,9 +19,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_DB=wakyefest
-      - POSTGRES_USER=wakyeuser
-      - POSTGRES_PASSWORD=wakyepass
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
 
 volumes:
   postgres_data:

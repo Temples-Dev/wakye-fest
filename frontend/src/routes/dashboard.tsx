@@ -32,14 +32,6 @@ export function DashboardLayout() {
 
     return (
         <div className="flex h-screen bg-[#050505] font-outfit text-white overflow-hidden">
-            {/* Mobile Menu Button - Only visible on mobile */}
-            <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden fixed top-4 left-4 z-50 p-2 bg-black/80 backdrop-blur-sm border border-white/10 rounded-lg text-white hover:bg-white/10 transition"
-            >
-                {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-
             {/* Overlay - Only on mobile when menu is open */}
             {mobileMenuOpen && (
                 <div 
@@ -136,8 +128,18 @@ export function DashboardLayout() {
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 overflow-y-auto bg-[#0a0a0a]">
-                <Outlet />
+            <main className="flex-1 overflow-y-auto bg-[#0a0a0a] relative">
+                {/* Mobile Menu Button */}
+                <button
+                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                    className="md:hidden fixed top-4 left-4 z-50 p-2 bg-black/80 backdrop-blur-sm border border-white/10 rounded-lg text-white hover:bg-white/10 transition"
+                >
+                    {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                </button>
+                
+                <div className="pt-16 md:pt-0">
+                    <Outlet />
+                </div>
             </main>
         </div>
     )

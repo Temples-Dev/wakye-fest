@@ -42,7 +42,7 @@ export function DashboardLayout() {
 
             {/* Sidebar */}
             <aside className={`
-                w-64 bg-black border-r border-white/10 flex flex-col relative overflow-hidden
+                w-64 bg-black border-r border-white/10 flex flex-col overflow-hidden
                 fixed inset-y-0 left-0 z-50
                 transform transition-transform duration-200 ease-in-out
                 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}

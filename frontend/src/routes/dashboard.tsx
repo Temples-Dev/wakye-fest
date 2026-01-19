@@ -1,8 +1,8 @@
 
 import { Outlet, useNavigate } from '@tanstack/react-router'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from '@tanstack/react-router'
-import { LayoutDashboard, Users, CreditCard, LogOut, Settings as SettingsIcon, ScanLine } from 'lucide-react'
+import { LayoutDashboard, Users, CreditCard, LogOut, Settings as SettingsIcon, ScanLine, Menu, X } from 'lucide-react'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/dashboard')({
@@ -11,6 +11,7 @@ export const Route = createFileRoute('/dashboard')({
 
 export function DashboardLayout() {
     const navigate = useNavigate()
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
     useEffect(() => {
         const token = localStorage.getItem('access_token')
@@ -25,10 +26,36 @@ export function DashboardLayout() {
         navigate({ to: '/login' })
     }
 
+    const closeMobileMenu = () => {
+        setMobileMenuOpen(false)
+    }
+
     return (
-        <div className="flex h-screen bg-[#050505] font-outfit text-white">
+        <div className="flex h-screen bg-[#050505] font-outfit text-white overflow-hidden">
+            {/* Mobile Menu Button - Only visible on mobile */}
+            <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="md:hidden fixed top-4 left-4 z-50 p-2 bg-black/80 backdrop-blur-sm border border-white/10 rounded-lg text-white hover:bg-white/10 transition"
+            >
+                {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+
+            {/* Overlay - Only on mobile when menu is open */}
+            {mobileMenuOpen && (
+                <div 
+                    className="md:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+                    onClick={closeMobileMenu}
+                />
+            )}
+
             {/* Sidebar */}
-            <aside className="w-64 bg-black border-r border-white/10 flex flex-col relative overflow-hidden">
+            <aside className={`
+                w-64 bg-black border-r border-white/10 flex flex-col relative overflow-hidden
+                fixed inset-y-0 left-0 z-50
+                transform transition-transform duration-200 ease-in-out
+                ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
+                md:relative md:translate-x-0
+            `}>
                 <div className="absolute inset-0 bg-gradient-to-b from-[#1a472a]/20 to-transparent pointer-events-none" />
                 
                 <div className="p-6 border-b border-white/10 relative z-10">
@@ -49,7 +76,8 @@ export function DashboardLayout() {
                         }}
                         inactiveProps={{
                             className: "hover:bg-white/5 text-gray-400 hover:text-white"
-                        }}  
+                        }}
+                        onClick={closeMobileMenu}
                     >
                         <LayoutDashboard size={20} className="group-hover:text-yellow-400 transition-colors" />
                         <span>Overview</span>
@@ -64,6 +92,7 @@ export function DashboardLayout() {
                         inactiveProps={{
                             className: "hover:bg-white/5 text-gray-400 hover:text-white"
                         }}
+                        onClick={closeMobileMenu}
                     >
                         <SettingsIcon size={20} className="group-hover:text-yellow-400 transition-colors" />
                         <span>Settings</span>
@@ -78,6 +107,7 @@ export function DashboardLayout() {
                         inactiveProps={{
                             className: "hover:bg-white/5 text-gray-400 hover:text-white"
                         }}
+                        onClick={closeMobileMenu}
                     >
                         <ScanLine size={20} className="group-hover:text-yellow-400 transition-colors" />
                         <span>Check-in</span>

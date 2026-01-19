@@ -85,6 +85,30 @@ function CheckIn() {
   const startScanner = async () => {
     try {
       setError(null)
+      
+      // Check if camera permission is available
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        // Request camera permission explicitly
+        try {
+          await navigator.mediaDevices.getUserMedia({ video: true })
+        } catch (permError: any) {
+          if (permError.name === 'NotAllowedError') {
+            setError('Camera permission denied. Please allow camera access in your browser settings and try again.')
+          } else if (permError.name === 'NotFoundError') {
+            setError('No camera found. Please use manual entry below.')
+          } else if (permError.name === 'NotReadableError') {
+            setError('Camera is in use by another application. Please close other apps and try again.')
+          } else {
+            setError(`Camera error: ${permError.message}`)
+          }
+          return
+        }
+      } else {
+        setError('Camera not supported in this browser. Please use manual entry.')
+        return
+      }
+
+      // Permission granted, start the QR scanner
       const scanner = new Html5Qrcode('qr-reader')
       scannerRef.current = scanner
 
@@ -105,7 +129,7 @@ function CheckIn() {
       setScanning(true)
     } catch (err: any) {
       console.error('Scanner error:', err)
-      setError(err.message || 'Failed to start camera. Please allow camera access.')
+      setError(err.message || 'Failed to start camera. Please try manual entry.')
     }
   }
 

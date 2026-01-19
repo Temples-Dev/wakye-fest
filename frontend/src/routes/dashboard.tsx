@@ -2,7 +2,7 @@
 import { Outlet, useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { Link } from '@tanstack/react-router'
-import { LayoutDashboard, Users, LogOut, Settings as SettingsIcon, ScanLine, Menu, X, TrendingUp, Shield } from 'lucide-react'
+import { LayoutDashboard, Users, LogOut, ScanLine, Menu, X, TrendingUp, Shield } from 'lucide-react'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/dashboard')({

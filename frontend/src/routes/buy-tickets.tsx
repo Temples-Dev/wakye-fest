@@ -31,6 +31,7 @@ export function BuyTickets() {
   const [names, setNames] = useState<string[]>([''])
   const [phoneNumber, setPhoneNumber] = useState('')
   const [isProcessing, setIsProcessing] = useState(false)
+  const [isBulkDownloading, setIsBulkDownloading] = useState(false)
   const [tickets, setTickets] = useState<TicketData[]>([])
 
   const [network, setNetwork] = useState('MTN')
@@ -231,6 +232,31 @@ export function BuyTickets() {
     }
   }
 
+  const downloadAllTickets = async () => {
+    setIsBulkDownloading(true)
+    
+    for (let i = 0; i < tickets.length; i++) {
+      const ticket = tickets[i]
+      const node = document.getElementById(`ticket-element-${ticket.id}`)
+      if (!node) continue
+
+      try {
+        const dataUrl = await toPng(node, { cacheBust: true })
+        const fileName = `ticket-${ticket.name.replace(/\s+/g, '-')}-${ticket.short_code}.png`
+        download(dataUrl, fileName)
+        
+        // Add delay between downloads to prevent browser blocking
+        if (i < tickets.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 300))
+        }
+      } catch (error) {
+        console.error(`Failed to generate ticket for ${ticket.name}`, error)
+      }
+    }
+    
+    setIsBulkDownloading(false)
+  }
+
   const renderStep = () => {
     switch (step) {
       case 'quantity':
@@ -372,6 +398,28 @@ export function BuyTickets() {
                 <h2 className="text-3xl font-bold text-white mb-2">Payment Successful!</h2>
                 <p className="text-gray-400">Here are your tickets. See you at Waakye Fest!</p>
              </div>
+             
+             {tickets.length > 1 && (
+               <div className="mb-6 flex justify-center">
+                 <Button 
+                   onClick={downloadAllTickets} 
+                   disabled={isBulkDownloading}
+                   className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold px-8 py-3"
+                 >
+                   {isBulkDownloading ? (
+                     <>
+                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                       Downloading {tickets.length} tickets...
+                     </>
+                   ) : (
+                     <>
+                       <Download className="mr-2 h-4 w-4" />
+                       Download All Tickets ({tickets.length})
+                     </>
+                   )}
+                 </Button>
+               </div>
+             )}
              
              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 justify-items-center">
                 {tickets.map((ticket) => (

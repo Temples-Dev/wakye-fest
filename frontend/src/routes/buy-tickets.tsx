@@ -22,7 +22,7 @@ interface TicketData {
   id: string
   name: string
   short_code: string
-  type: 'General Admission'
+  type: string
 }
 
 export function BuyTickets() {
@@ -150,7 +150,7 @@ export function BuyTickets() {
                  id: t.id,
                  name: t.name,
                  short_code: t.short_code,
-                 type: 'General Admission'
+                  type: eventSettings.name || 'General Admission'
              }))
              
              setTickets(backendTickets)

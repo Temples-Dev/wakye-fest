@@ -4,12 +4,12 @@ from .models import Ticket
 class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
-        fields = ['id', 'name', 'email', 'phone_number', 'paystack_reference', 'verified', 'checked_in', 'created_at', 'short_code']
+        fields = ['id', 'event', 'name', 'email', 'phone_number', 'paystack_reference', 'verified', 'checked_in', 'created_at', 'short_code']
         read_only_fields = ['id', 'verified', 'checked_in', 'created_at', 'short_code']
 
-from .models import EventSettings
+from .models import Event
 
-class EventSettingsSerializer(serializers.ModelSerializer):
+class EventSerializer(serializers.ModelSerializer):
     class Meta:
-        model = EventSettings
+        model = Event
         fields = '__all__'

@@ -18,7 +18,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { Search, ChevronLeft, ChevronRight, Loader2, CheckCircle, XCircle } from 'lucide-react'
+import { Search, ChevronLeft, ChevronRight, Loader2, CheckCircle } from 'lucide-react'
 
 export const Route = createFileRoute('/dashboard/attendees')({
   component: Attendees,
@@ -48,6 +48,23 @@ function Attendees() {
     const [search, setSearch] = useState('')
     const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
+    const [eventName, setEventName] = useState('General Admission')
+    
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8001'
+                const res = await fetch(`${apiUrl}/api/settings/`)
+                if (res.ok) {
+                    const data = await res.json()
+                    setEventName(data.name || 'General Admission')
+                }
+            } catch (error) {
+                console.error("Failed to fetch settings", error)
+            }
+        }
+        fetchSettings()
+    }, [])
     
     const fetchAttendees = async () => {
         setLoading(true)
@@ -141,7 +158,7 @@ function Attendees() {
                                         <TableRow key={attendee.id} className="border-white/10 hover:bg-white/5">
                                             <TableCell>
                                                 <div className="font-medium text-white">{attendee.name}</div>
-                                                <div className="text-xs text-gray-500 uppercase">General Admission</div>
+                                                <div className="text-xs text-gray-500 uppercase">{eventName}</div>
                                             </TableCell>
                                             <TableCell>
                                                 <div className="text-gray-300">{attendee.email}</div>

@@ -2,8 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, generics, permissions
 from django.conf import settings
-from .models import Ticket, EventSettings
-from .serializers import TicketSerializer, EventSettingsSerializer
+from .models import Ticket, Event
+from .serializers import TicketSerializer, EventSerializer
 import requests
 import os
 from rest_framework.pagination import PageNumberPagination
@@ -16,6 +16,14 @@ class InitiatePaymentView(APIView):
         phone_number = request.data.get('phone_number')
         names = request.data.get('names', [])
         name = request.data.get('name') # Fallback if single name
+        
+        # Get active event
+        event = Event.objects.filter(is_active=True).first()
+        if not event:
+             # Fallback or error - for now fallback to creating one or getting first
+             event = Event.objects.first()
+             if not event:
+                 event = Event.objects.create(name="Waakye Fest 2026", is_active=True)
 
         if not names and name:
             names = [name]
@@ -30,6 +38,7 @@ class InitiatePaymentView(APIView):
         tickets = []
         for attendee_name in names:
             ticket = Ticket.objects.create(
+                event=event,
                 name=attendee_name,
                 email=email,
                 phone_number=phone_number,
@@ -80,8 +89,13 @@ class VerifyPaymentView(APIView):
                  names = request.data.get('names', [])
                  if not names and name: names = [name]
                  
+                 # Active event
+                 event = Event.objects.filter(is_active=True).first()
+                 if not event: event = Event.objects.create(name="Waakye Fest 2026", is_active=True)
+
                  for attendee_name in names:
                     Ticket.objects.create(
+                        event=event,
                         name=attendee_name,
                         email=email,
                         phone_number=phone_number,
@@ -104,13 +118,22 @@ class TicketDetailView(generics.RetrieveAPIView):
 class DashboardStatsView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     def get(self, request):
-        total_tickets = Ticket.objects.count()
-        verified_tickets = Ticket.objects.filter(verified=True).count()
+        # Filter by active event if desired, or all? 
+        # For now, let's keep it simple and show all stats or filter by active event
+        # Let's filter by active event to support multi-year goal
+        event = Event.objects.filter(is_active=True).first()
+        if event:
+            tickets_qs = Ticket.objects.filter(event=event)
+        else:
+            tickets_qs = Ticket.objects.all()
+
+        total_tickets = tickets_qs.count()
+        verified_tickets = tickets_qs.filter(verified=True).count()
         # Revenue: Assuming fixed price of 50 GHS per ticket for now as per frontend
         # In a real app, we should store price in the Ticket model or Transaction model
         total_revenue = verified_tickets * 50 
         
-        recent_sales = Ticket.objects.filter(verified=True).order_by('-created_at')[:5]
+        recent_sales = tickets_qs.filter(verified=True).order_by('-created_at')[:5]
         recent_sales_data = TicketSerializer(recent_sales, many=True).data
 
         return Response({
@@ -136,6 +159,14 @@ class TransactionListView(generics.ListAPIView):
     search_fields = ['name', 'email', 'paystack_reference', 'phone_number']
     permission_classes = [permissions.IsAuthenticated]
 
+    def get_queryset(self):
+         # Optionally filter by active event
+         qs = super().get_queryset()
+         event = Event.objects.filter(is_active=True).first()
+         if event:
+             return qs.filter(event=event)
+         return qs
+
 
 class EventSettingsView(APIView):
     def get_permissions(self):
@@ -144,13 +175,20 @@ class EventSettingsView(APIView):
         return [permissions.IsAuthenticated()]
 
     def get(self, request):
-        settings, created = EventSettings.objects.get_or_create(id=1) # Singleton
-        serializer = EventSettingsSerializer(settings)
+        # Get active event or create default
+        event = Event.objects.filter(is_active=True).first()
+        if not event:
+             event = Event.objects.create(name="Waakye Fest 2026", is_active=True)
+        serializer = EventSerializer(event)
         return Response(serializer.data)
 
     def post(self, request):
-        settings, created = EventSettings.objects.get_or_create(id=1)
-        serializer = EventSettingsSerializer(settings, data=request.data, partial=True)
+        # Update active event
+        event = Event.objects.filter(is_active=True).first()
+        if not event:
+            event = Event.objects.create(name="Waakye Fest 2026", is_active=True)
+            
+        serializer = EventSerializer(event, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

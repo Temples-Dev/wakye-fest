@@ -1,8 +1,19 @@
 from django.db import models
 import uuid
 
+class Event(models.Model):
+    name = models.CharField(max_length=255, default="Waakye Fest 2026")
+    date = models.CharField(max_length=100, default="Dec 24, 2026")
+    time = models.CharField(max_length=100, default="10:00 AM - 10:00 PM")
+    location = models.CharField(max_length=255, default="Ho Jubilee Park, Ho")
+    is_active = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return self.name
+
 class Ticket(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='tickets', null=True, blank=True)
     name = models.CharField(max_length=255)
     email = models.EmailField()
     phone_number = models.CharField(max_length=20)
@@ -26,18 +37,3 @@ class Ticket(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.short_code}"
-
-class EventSettings(models.Model):
-    name = models.CharField(max_length=255, default="Waakye Fest 2026")
-    date = models.CharField(max_length=100, default="Dec 24, 2026")
-    time = models.CharField(max_length=100, default="10:00 AM - 10:00 PM")
-    location = models.CharField(max_length=255, default="Ho Jubilee Park, Ho")
-    
-    def save(self, *args, **kwargs):
-        # Singleton pattern: ensure only one instance exists
-        if not self.pk and EventSettings.objects.exists():
-             return EventSettings.objects.first()
-        return super(EventSettings, self).save(*args, **kwargs)
-
-    def __str__(self):
-        return self.name

@@ -17,8 +17,10 @@ import { Route as BuyTicketsRouteImport } from './routes/buy-tickets'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
+import { Route as DashboardOrganizersRouteImport } from './routes/dashboard/organizers'
 import { Route as DashboardCheckInRouteImport } from './routes/dashboard/check-in'
 import { Route as DashboardAttendeesRouteImport } from './routes/dashboard/attendees'
+import { Route as DashboardAnalyticsRouteImport } from './routes/dashboard/analytics'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -60,6 +62,11 @@ const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardOrganizersRoute = DashboardOrganizersRouteImport.update({
+  id: '/organizers',
+  path: '/organizers',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardCheckInRoute = DashboardCheckInRouteImport.update({
   id: '/check-in',
   path: '/check-in',
@@ -70,6 +77,11 @@ const DashboardAttendeesRoute = DashboardAttendeesRouteImport.update({
   path: '/attendees',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardAnalyticsRoute = DashboardAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => DashboardRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -78,8 +90,10 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRouteWithChildren
   '/details': typeof DetailsRoute
   '/login': typeof LoginRoute
+  '/dashboard/analytics': typeof DashboardAnalyticsRoute
   '/dashboard/attendees': typeof DashboardAttendeesRoute
   '/dashboard/check-in': typeof DashboardCheckInRoute
+  '/dashboard/organizers': typeof DashboardOrganizersRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/': typeof DashboardIndexRoute
 }
@@ -89,8 +103,10 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/details': typeof DetailsRoute
   '/login': typeof LoginRoute
+  '/dashboard/analytics': typeof DashboardAnalyticsRoute
   '/dashboard/attendees': typeof DashboardAttendeesRoute
   '/dashboard/check-in': typeof DashboardCheckInRoute
+  '/dashboard/organizers': typeof DashboardOrganizersRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard': typeof DashboardIndexRoute
 }
@@ -102,8 +118,10 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRouteWithChildren
   '/details': typeof DetailsRoute
   '/login': typeof LoginRoute
+  '/dashboard/analytics': typeof DashboardAnalyticsRoute
   '/dashboard/attendees': typeof DashboardAttendeesRoute
   '/dashboard/check-in': typeof DashboardCheckInRoute
+  '/dashboard/organizers': typeof DashboardOrganizersRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/': typeof DashboardIndexRoute
 }
@@ -116,8 +134,10 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/details'
     | '/login'
+    | '/dashboard/analytics'
     | '/dashboard/attendees'
     | '/dashboard/check-in'
+    | '/dashboard/organizers'
     | '/dashboard/settings'
     | '/dashboard/'
   fileRoutesByTo: FileRoutesByTo
@@ -127,8 +147,10 @@ export interface FileRouteTypes {
     | '/contact'
     | '/details'
     | '/login'
+    | '/dashboard/analytics'
     | '/dashboard/attendees'
     | '/dashboard/check-in'
+    | '/dashboard/organizers'
     | '/dashboard/settings'
     | '/dashboard'
   id:
@@ -139,8 +161,10 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/details'
     | '/login'
+    | '/dashboard/analytics'
     | '/dashboard/attendees'
     | '/dashboard/check-in'
+    | '/dashboard/organizers'
     | '/dashboard/settings'
     | '/dashboard/'
   fileRoutesById: FileRoutesById
@@ -212,6 +236,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSettingsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/organizers': {
+      id: '/dashboard/organizers'
+      path: '/organizers'
+      fullPath: '/dashboard/organizers'
+      preLoaderRoute: typeof DashboardOrganizersRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/check-in': {
       id: '/dashboard/check-in'
       path: '/check-in'
@@ -226,19 +257,30 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardAttendeesRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/analytics': {
+      id: '/dashboard/analytics'
+      path: '/analytics'
+      fullPath: '/dashboard/analytics'
+      preLoaderRoute: typeof DashboardAnalyticsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
   }
 }
 
 interface DashboardRouteChildren {
+  DashboardAnalyticsRoute: typeof DashboardAnalyticsRoute
   DashboardAttendeesRoute: typeof DashboardAttendeesRoute
   DashboardCheckInRoute: typeof DashboardCheckInRoute
+  DashboardOrganizersRoute: typeof DashboardOrganizersRoute
   DashboardSettingsRoute: typeof DashboardSettingsRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardAnalyticsRoute: DashboardAnalyticsRoute,
   DashboardAttendeesRoute: DashboardAttendeesRoute,
   DashboardCheckInRoute: DashboardCheckInRoute,
+  DashboardOrganizersRoute: DashboardOrganizersRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }

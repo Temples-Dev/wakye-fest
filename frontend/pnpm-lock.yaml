@@ -47,6 +47,9 @@ importers:
       html-to-image:
         specifier: ^1.11.13
         version: 1.11.13
+      html5-qrcode:
+        specifier: ^2.3.8
+        version: 2.3.8
       lucide-react:
         specifier: ^0.544.0
         version: 0.544.0(react@19.2.3)
@@ -1176,6 +1179,9 @@ packages:
 
   html-to-image@1.11.13:
     resolution: {integrity: sha512-cuOPoI7WApyhBElTTb9oqsawRvZ0rHhaHwghRLlTuffoD1B2aDemlCruLeZrUIIdvG7gs9xeELEPm6PhuASqrg==}
+
+  html5-qrcode@2.3.8:
+    resolution: {integrity: sha512-jsr4vafJhwoLVEDW3n1KvPnCCXWaQfRng0/EEYk1vNcQGcG/htAdhJX0be8YyqMoSz7+hZvOZSTAepsabiuhiQ==}
 
   http-proxy-agent@7.0.2:
     resolution: {integrity: sha512-T1gkAiYYDWYx3V5Bmyu7HcfcvL7mUrTWiM6yOfa3PIphViJ/gFPbvidQ+veqSOHci/PxBcDabeUNCzpOODJZig==}
@@ -2719,6 +2725,8 @@ snapshots:
       - '@noble/hashes'
 
   html-to-image@1.11.13: {}
+
+  html5-qrcode@2.3.8: {}
 
   http-proxy-agent@7.0.2:
     dependencies:

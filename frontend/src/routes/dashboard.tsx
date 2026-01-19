@@ -2,7 +2,7 @@
 import { Outlet, useNavigate } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { Link } from '@tanstack/react-router'
-import { LayoutDashboard, Users, CreditCard, LogOut, Settings as SettingsIcon } from 'lucide-react'
+import { LayoutDashboard, Users, CreditCard, LogOut, Settings as SettingsIcon, ScanLine } from 'lucide-react'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/dashboard')({
@@ -67,6 +67,20 @@ export function DashboardLayout() {
                     >
                         <SettingsIcon size={20} className="group-hover:text-yellow-400 transition-colors" />
                         <span>Settings</span>
+                    </Link>
+
+                    <Link 
+                        to="/dashboard/check-in" 
+                        className="flex items-center space-x-3 px-4 py-3 rounded-lg text-white transition-all duration-200 group"
+                        activeProps={{
+                            className: "bg-gradient-to-r from-yellow-500/10 to-transparent border-l-2 border-yellow-500 text-yellow-400"
+                        }}
+                        inactiveProps={{
+                            className: "hover:bg-white/5 text-gray-400 hover:text-white"
+                        }}
+                    >
+                        <ScanLine size={20} className="group-hover:text-yellow-400 transition-colors" />
+                        <span>Check-in</span>
                     </Link>
                    
                    {/* Placeholder links for future expansion */}

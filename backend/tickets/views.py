@@ -7,13 +7,41 @@ from .serializers import TicketSerializer
 import requests
 import os
 
+class InitiatePaymentView(APIView):
+    def post(self, request):
+        reference = request.data.get('reference')
+        email = request.data.get('email')
+        phone_number = request.data.get('phone_number')
+        names = request.data.get('names', [])
+        name = request.data.get('name') # Fallback if single name
+
+        if not names and name:
+            names = [name]
+
+        if not reference or not email or not names:
+            return Response({'error': 'Missing required fields'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if already exists to prevent duplicates
+        if Ticket.objects.filter(paystack_reference=reference).exists():
+             return Response({'message': 'Transaction already initialized'}, status=status.HTTP_200_OK)
+
+        tickets = []
+        for attendee_name in names:
+            ticket = Ticket.objects.create(
+                name=attendee_name,
+                email=email,
+                phone_number=phone_number,
+                paystack_reference=reference,
+                verified=False # Pending
+            )
+            tickets.append(ticket)
+        
+        return Response({'message': 'Transaction initialized', 'count': len(tickets)}, status=status.HTTP_201_CREATED)
+
 class VerifyPaymentView(APIView):
     def post(self, request):
         reference = request.data.get('reference')
-        name = request.data.get('name')
-        email = request.data.get('email')
-        phone_number = request.data.get('phone_number')
-
+        
         if not reference:
             return Response({'error': 'No reference provided'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -39,46 +67,30 @@ class VerifyPaymentView(APIView):
                  pass
 
         if verify_success:
-            # Handle multiple tickets
-            names = request.data.get('names', [])
-            if not names and name: names = [name]
+            # Update existing tickets as verified
+            updated_count = Ticket.objects.filter(paystack_reference=reference).update(verified=True)
             
-            created_tickets = []
-            for attendee_name in names:
-                # Avoid duplicates if reference helps
-                # But reference is unique in model, so we can't create multiple tickets with same reference if unique=True.
-                # FIX: We probably want one transaction (reference) -> Multiple tickets.
-                # So Ticket model `paystack_reference` should NOT be unique per ticket, but unique per group?
-                # Or we append suffix?
-                # Or we change model constraint.
-                # Let's check model definition.
-                
-                # Model has: paystack_reference = models.CharField(max_length=100, unique=True)
-                # This breaks bulk buying!
-                # I should update model first.
-                pass
-                
-            # If I update model to unique=False, then multiple tickets can share reference.
-            # I will proceed with writing this view assuming unique=False, and fix the model in next step or now.
+            # If no tickets found (maybe initialization failed or direct verify call), create them
+            if updated_count == 0:
+                 name = request.data.get('name')
+                 email = request.data.get('email')
+                 phone_number = request.data.get('phone_number')
+                 names = request.data.get('names', [])
+                 if not names and name: names = [name]
+                 
+                 for attendee_name in names:
+                    Ticket.objects.create(
+                        name=attendee_name,
+                        email=email,
+                        phone_number=phone_number,
+                        paystack_reference=reference, 
+                        verified=True
+                    )
             
-            # Let's fix loop to be safe for now
-            pass
-            
-            # Actually I can't verify model right now without context switch.
-            # I'll update view logic to assume I'll fix the model.
-            
-            for attendee_name in names:
-                 ticket = Ticket.objects.create(
-                    name=attendee_name,
-                    email=email,
-                    phone_number=phone_number,
-                    paystack_reference=reference, 
-                    verified=True
-                )
-                 created_tickets.append(ticket)
-            
-            serializer = TicketSerializer(created_tickets, many=True)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            # Fetch and return tickets
+            tickets = Ticket.objects.filter(paystack_reference=reference)
+            serializer = TicketSerializer(tickets, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         
         return Response({'error': 'Payment verification failed'}, status=status.HTTP_400_BAD_REQUEST)
 

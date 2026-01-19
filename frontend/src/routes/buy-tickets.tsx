@@ -34,6 +34,7 @@ export function BuyTickets() {
 
   const [network, setNetwork] = useState('MTN')
   const [email, setEmail] = useState('')
+  const [reference, setReference] = useState((new Date()).getTime().toString())
 
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseInt(e.target.value)
@@ -63,6 +64,8 @@ export function BuyTickets() {
       alert('Please enter all attendee names')
       return
     }
+    // Update reference for new transaction attempt
+    setReference((new Date()).getTime().toString())
     setStep('payment')
   }
 
@@ -71,7 +74,7 @@ export function BuyTickets() {
     NOTE: Using a placeholder public key. The user should replace this.
   */
   const config = {
-      reference: (new Date()).getTime().toString(),
+      reference: reference, // Use state reference
       email: email,
       amount: quantity * 50 * 100, // Amount in pesewas
       publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || '',
@@ -148,7 +151,7 @@ export function BuyTickets() {
 
   const initializePayment = usePaystackPayment(config);
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
     if (phoneNumber.length !== 10) {
        alert('Please enter a valid 10-digit mobile number')
        return
@@ -159,7 +162,37 @@ export function BuyTickets() {
     }
     
     setIsProcessing(true)
-    initializePayment({onSuccess, onClose})
+
+    try {
+        // Initiate transaction on backend
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+        const res = await fetch(`${apiUrl}/api/initiate-payment/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                reference: reference, // Use state reference
+                email: email,
+                phone_number: phoneNumber,
+                names: names,
+                name: names[0] // Fallback
+            })
+        })
+
+        if (!res.ok) {
+            const data = await res.json()
+            throw new Error(data.error || 'Failed to initiate transaction')
+        }
+
+        // Proceed to Paystack
+        initializePayment({onSuccess, onClose})
+        
+    } catch (error) {
+        console.error("Payment initiation failed", error)
+        alert('Could not initiate payment. Please try again.')
+        setIsProcessing(false)
+    }
   }
 
   const downloadTicket = async (id: string) => {

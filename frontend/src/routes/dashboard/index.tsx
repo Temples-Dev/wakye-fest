@@ -51,9 +51,16 @@ export function Dashboard() {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const res = await fetch(`${apiUrl}/api/stats/`)
-                const data = await res.json()
-                setStats(data)
+                const token = localStorage.getItem('access_token')
+                const res = await fetch(`${apiUrl}/api/stats/`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                if (res.ok) {
+                    const data = await res.json()
+                    setStats(data)
+                }
             } catch (error) {
                 console.error("Failed to fetch stats", error)
             }

@@ -136,3 +136,57 @@ class TransactionListView(generics.ListAPIView):
     search_fields = ['name', 'email', 'paystack_reference', 'phone_number']
     permission_classes = [permissions.IsAuthenticated]
 
+
+class EventSettingsView(APIView):
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated()]
+
+    def get(self, request):
+        settings, created = EventSettings.objects.get_or_create(id=1) # Singleton
+        serializer = EventSettingsSerializer(settings)
+        return Response(serializer.data)
+
+    def post(self, request):
+        settings, created = EventSettings.objects.get_or_create(id=1)
+        serializer = EventSettingsSerializer(settings, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class CheckInView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def post(self, request):
+        ticket_id = request.data.get('ticket_id')
+        qr_content = request.data.get('qr_code_content')
+        ticket_ids = request.data.get('ticket_ids', []) # For bulk check-in via checkbox maybe?
+
+        # Parse QR content if provided (expecting JSON string or raw ID)
+        if qr_content:
+            try:
+                # Try JSON parse
+                import json
+                data = json.loads(qr_content)
+                if 'id' in data:
+                    ticket_id = data['id']
+            except:
+                # Assuming raw ID or unsupported format
+                ticket_id = qr_content
+        
+        ids_to_process = ticket_ids
+        if ticket_id:
+             ids_to_process.append(ticket_id)
+        
+        if not ids_to_process:
+             return Response({'error': 'No ticket ID provided'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Process check-ins
+        updated_count = Ticket.objects.filter(id__in=ids_to_process, verified=True).update(checked_in=True)
+        
+        if updated_count == 0:
+             return Response({'error': 'No valid verified tickets found for given IDs'}, status=status.HTTP_400_BAD_REQUEST)
+             
+        return Response({'message': f'Successfully checked in {updated_count} tickets.', 'count': updated_count}, status=status.HTTP_200_OK)

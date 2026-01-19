@@ -13,3 +13,18 @@ class Ticket(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.id}"
+
+class EventSettings(models.Model):
+    name = models.CharField(max_length=255, default="Waakye Fest 2026")
+    date = models.CharField(max_length=100, default="Dec 24, 2026")
+    time = models.CharField(max_length=100, default="10:00 AM - 10:00 PM")
+    location = models.CharField(max_length=255, default="Ho Jubilee Park, Ho")
+    
+    def save(self, *args, **kwargs):
+        # Singleton pattern: ensure only one instance exists
+        if not self.pk and EventSettings.objects.exists():
+             return EventSettings.objects.first()
+        return super(EventSettings, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name

@@ -2,10 +2,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, generics, permissions
 from django.conf import settings
-from .models import Ticket
-from .serializers import TicketSerializer
+from .models import Ticket, EventSettings
+from .serializers import TicketSerializer, EventSettingsSerializer
 import requests
 import os
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.filters import SearchFilter
 
 class InitiatePaymentView(APIView):
     def post(self, request):

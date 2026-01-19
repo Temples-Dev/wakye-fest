@@ -1,6 +1,6 @@
 
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -35,6 +35,27 @@ export function BuyTickets() {
   const [network, setNetwork] = useState('MTN')
   const [email, setEmail] = useState('')
   const [reference, setReference] = useState((new Date()).getTime().toString())
+  const [eventSettings, setEventSettings] = useState({
+      date: 'Dec 24, 2026',
+      time: '12:00 PM',
+      name: 'WAAKYE FEST'
+  })
+
+  useEffect(() => {
+      const fetchSettings = async () => {
+          try {
+              const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8001'
+              const res = await fetch(`${apiUrl}/api/settings/`)
+              if (res.ok) {
+                  const data = await res.json()
+                  setEventSettings(data)
+              }
+          } catch (error) {
+              console.error("Failed to fetch settings", error)
+          }
+      }
+      fetchSettings()
+  }, [])
 
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseInt(e.target.value)
@@ -358,6 +379,7 @@ export function BuyTickets() {
                                 name={ticket.name}
                                 ticketId={ticket.id}
                                 type={ticket.type}
+                                eventDetails={eventSettings}
                             />
                         </div>
                         <Button onClick={() => downloadTicket(ticket.id)} className="w-full bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700">

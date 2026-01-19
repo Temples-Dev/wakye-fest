@@ -5,18 +5,30 @@ import QRCode from 'react-qr-code'
 // I will just use a placeholder QR code image or a simple div since I can't easily install new packages without user permission/network risk.
 // Wait, I can simulate a QR code with a styled div pattern.
 
+interface EventDetails {
+    date: string
+    time: string
+    name?: string
+}
+
 interface TicketProps {
   name: string
   ticketId: string
   type: string
+  eventDetails?: EventDetails
 }
 
-export const TicketView = ({ name, ticketId, type }: TicketProps) => {
+export const TicketView = ({ name, ticketId, type, eventDetails }: TicketProps) => {
+  // Default values if not provided
+  const date = eventDetails?.date || "Dec 24, 2026"
+  const time = eventDetails?.time || "12:00 PM"
+  const eventName = eventDetails?.name || "WAAKYE FEST"
+  
   return (
     <div className="relative w-full max-w-sm mx-auto bg-black border-2 border-yellow-500 rounded-3xl overflow-hidden shadow-[0_0_30px_rgba(234,179,8,0.3)] text-white font-mono">
       {/* Header */}
       <div className="bg-gradient-to-r from-yellow-500 to-orange-600 p-6 text-center">
-        <h2 className="text-3xl font-black text-black">WAAKYE FEST</h2>
+        <h2 className="text-3xl font-black text-black uppercase">{eventName}</h2>
         <p className="text-black font-bold tracking-widest">2026</p>
       </div>
 
@@ -32,11 +44,11 @@ export const TicketView = ({ name, ticketId, type }: TicketProps) => {
         <div className="grid grid-cols-2 gap-4">
             <div>
                 <div className="text-gray-400 text-xs uppercase tracking-wider mb-1">Date</div>
-                <div className="text-sm font-bold">Dec 24, 2026</div>
+                <div className="text-sm font-bold">{date}</div>
             </div>
             <div>
                 <div className="text-gray-400 text-xs uppercase tracking-wider mb-1">Time</div>
-                <div className="text-sm font-bold">12:00 PM</div>
+                <div className="text-sm font-bold">{time}</div>
             </div>
             <div>
                  <div className="text-gray-400 text-xs uppercase tracking-wider mb-1">Cost</div>
@@ -65,7 +77,7 @@ export const TicketView = ({ name, ticketId, type }: TicketProps) => {
                 />
              </div>
         </div>
-        <p className="mt-4 text-xs text-gray-500 font-mono tracking-widest">{ticketId}</p>
+
       </div>
     </div>
   )

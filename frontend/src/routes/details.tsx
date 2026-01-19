@@ -1,4 +1,5 @@
 
+import { useState, useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { Card, CardContent } from '@/components/ui/card'
 import { Calendar, Clock, MapPin, Music, Utensils, Zap } from 'lucide-react'
@@ -9,6 +10,28 @@ export const Route = createFileRoute('/details')({
 })
 
 export function Details() {
+  const [settings, setSettings] = useState({
+        date: 'December 24, 2026',
+        time: '12:00 PM - 10:00 PM',
+        location: 'Ho Jubilee Park, Ho'
+  })
+
+  useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8001'
+                const res = await fetch(`${apiUrl}/api/settings/`)
+                if (res.ok) {
+                    const data = await res.json()
+                    setSettings(data)
+                }
+            } catch (error) {
+                console.error("Failed to fetch settings", error)
+            }
+        }
+        fetchSettings()
+  }, [])
+
   return (
     <div className="min-h-screen bg-black pt-24 px-4 pb-12">
       <Header />
@@ -30,21 +53,21 @@ export function Details() {
                 <CardContent className="pt-6 text-center space-y-2">
                     <Calendar className="w-10 h-10 text-yellow-500 mx-auto mb-2" />
                     <h3 className="text-xl font-bold">Date</h3>
-                    <p className="text-gray-400">December 24, 2026</p>
+                    <p className="text-gray-400">{settings.date}</p>
                 </CardContent>
             </Card>
             <Card className="bg-zinc-900 border-zinc-800 text-white hover:border-yellow-500 transition-colors">
                 <CardContent className="pt-6 text-center space-y-2">
                     <Clock className="w-10 h-10 text-yellow-500 mx-auto mb-2" />
                     <h3 className="text-xl font-bold">Time</h3>
-                    <p className="text-gray-400">12:00 PM - 10:00 PM</p>
+                    <p className="text-gray-400">{settings.time}</p>
                 </CardContent>
             </Card>
             <Card className="bg-zinc-900 border-zinc-800 text-white hover:border-yellow-500 transition-colors">
                 <CardContent className="pt-6 text-center space-y-2">
                     <MapPin className="w-10 h-10 text-yellow-500 mx-auto mb-2" />
                     <h3 className="text-xl font-bold">Location</h3>
-                    <p className="text-gray-400">Ho Jubilee Park, Ho</p>
+                    <p className="text-gray-400">{settings.location}</p>
                 </CardContent>
             </Card>
         </div>

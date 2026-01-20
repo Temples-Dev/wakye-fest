@@ -40,8 +40,6 @@ export function BuyTickets() {
   const [eventSettings, setEventSettings] = useState({
       date: 'Dec 24, 2026',
       time: '12:00 PM',
-      date: 'Dec 24, 2026',
-      time: '12:00 PM',
       name: 'WAAKYE FEST',
       ticket_price: '50.00'
   })

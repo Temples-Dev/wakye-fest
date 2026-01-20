@@ -16,7 +16,6 @@ interface TicketProps {
   ticketId: string
   shortCode: string
   type: string
-  type: string
   eventDetails?: EventDetails
   price?: string
 }

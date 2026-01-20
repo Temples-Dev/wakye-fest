@@ -43,7 +43,6 @@ function Settings() {
         name: '',
         date: '',
         time: '',
-        time: '',
         location: '',
         ticket_price: '50.00'
     })
@@ -112,7 +111,7 @@ function Settings() {
 
             if (res.ok) {
                 setShowCreateModal(false)
-                setNewEvent({ name: '', date: '', time: '', location: '' })
+                setNewEvent({ name: '', date: '', time: '', location: '', ticket_price: '50.00' })
                 fetchEvents()
                 toast.success('Event created successfully!')
             } else {

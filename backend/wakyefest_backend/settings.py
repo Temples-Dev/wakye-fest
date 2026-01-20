@@ -72,24 +72,12 @@ TEMPLATES = [
 WSGI_APPLICATION = 'wakyefest_backend.wsgi.application'
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default=f"postgres://{config('DB_USER', default='')}:{config('DB_PASSWORD', default='')}@{config('DB_HOST', default='')}:{config('DB_PORT', default='')}/{config('DB_NAME', default='')}",
-        conn_max_age=600
+    'default': config(
+        'DATABASE_URL',
+        default=f"postgres://{config('DB_USER', default='')}:{config('DB_PASSWORD', default='')}@{config('DB_HOST', default='localhost')}:{config('DB_PORT', default='5432')}/{config('DB_NAME', default='')}",
+        cast=dj_database_url.parse
     )
 }
-
-# Fallback for when connection string isn't fully formed (e.g. SQLite default in development if vars missing)
-if not config('DATABASE_URL', default=None) and not config('DB_HOST', default=None):
-    DATABASES = {
-        'default': {
-            'ENGINE': config('DB_ENGINE', default='django.db.backends.sqlite3'),
-            'NAME': config('DB_NAME', default=BASE_DIR / 'db.sqlite3'),
-            'USER': config('DB_USER', default=''),
-            'PASSWORD': config('DB_PASSWORD', default=''),
-            'HOST': config('DB_HOST', default=''),
-            'PORT': config('DB_PORT', default=''),
-        }
-    }
 
 
 # CORS Configuration

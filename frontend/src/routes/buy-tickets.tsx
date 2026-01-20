@@ -40,7 +40,10 @@ export function BuyTickets() {
   const [eventSettings, setEventSettings] = useState({
       date: 'Dec 24, 2026',
       time: '12:00 PM',
-      name: 'WAAKYE FEST'
+      date: 'Dec 24, 2026',
+      time: '12:00 PM',
+      name: 'WAAKYE FEST',
+      ticket_price: '50.00'
   })
 
   useEffect(() => {
@@ -99,7 +102,7 @@ export function BuyTickets() {
   const config = {
       reference: reference, // Use state reference
       email: email,
-      amount: quantity * 0.50 * 100, // Amount in pesewas (0.50 GHS for testing)
+      amount: quantity * parseFloat(eventSettings.ticket_price || '50') * 100, // Amount in pesewas (dynamic)
       publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || '',
       currency: 'GHS',
       channels: ['mobile_money', 'card'] as any, // Typed as any to bypass potential type issues with channel strings
@@ -277,7 +280,7 @@ export function BuyTickets() {
                   onChange={handleQuantityChange}
                   className="bg-black border-zinc-700 text-white text-lg"
                 />
-                <p className="text-sm text-gray-400 text-right">Total: <span className="text-yellow-500 font-bold">GHS {quantity * 50}.00</span></p>
+                <p className="text-sm text-gray-400 text-right">Total: <span className="text-yellow-500 font-bold">GHS {(quantity * parseFloat(eventSettings.ticket_price || '50')).toFixed(2)}</span></p>
               </div>
             </CardContent>
             <CardFooter>
@@ -328,7 +331,7 @@ export function BuyTickets() {
               <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
                   <div className="flex justify-between items-center mb-2">
                       <span className="text-sm text-gray-300">Total Amount</span>
-                      <span className="text-xl font-bold text-yellow-500">GHS {quantity * 50}.00</span>
+                      <span className="text-xl font-bold text-yellow-500">GHS {(quantity * parseFloat(eventSettings.ticket_price || '50')).toFixed(2)}</span>
                   </div>
                    <div className="text-xs text-gray-500">You will receive a prompt to authorize payment.</div>
               </div>
@@ -431,6 +434,7 @@ export function BuyTickets() {
                                 shortCode={ticket.short_code}
                                 type={ticket.type}
                                 eventDetails={eventSettings}
+                                price={eventSettings.ticket_price || '50.00'}
                             />
                         </div>
                         <Button onClick={() => downloadTicket(ticket.id)} className="w-full bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700">

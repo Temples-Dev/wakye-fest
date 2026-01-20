@@ -7,6 +7,7 @@ class Event(models.Model):
     time = models.CharField(max_length=100, default="10:00 AM - 10:00 PM")
     location = models.CharField(max_length=255, default="Ho Jubilee Park, Ho")
     is_active = models.BooleanField(default=False)
+    ticket_price = models.DecimalField(max_digits=10, decimal_places=2, default=50.00)
     
     def __str__(self):
         return self.name

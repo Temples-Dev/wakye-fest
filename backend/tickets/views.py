@@ -129,8 +129,10 @@ class DashboardStatsView(APIView):
 
         total_tickets = tickets_qs.count()
         verified_tickets = tickets_qs.filter(verified=True).count()
-        # Revenue: Assuming fixed price of 0.50 GHS per ticket for testing
-        total_revenue = verified_tickets * 0.50 
+        # Revenue: Use ticket_price from event or default to 50.00
+        price = event.ticket_price if event else 50.00
+        # Convert Decimal to float for simple multiplication if needed, or keep as Decimal
+        total_revenue = verified_tickets * float(price) 
         
         recent_sales = tickets_qs.filter(verified=True).order_by('-created_at')[:5]
         recent_sales_data = TicketSerializer(recent_sales, many=True).data

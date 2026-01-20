@@ -30,6 +30,7 @@ interface Event {
     time: string
     location: string
     is_active: boolean
+    ticket_price: string
 }
 
 function Settings() {
@@ -42,7 +43,9 @@ function Settings() {
         name: '',
         date: '',
         time: '',
-        location: ''
+        time: '',
+        location: '',
+        ticket_price: '50.00'
     })
 
     useEffect(() => {
@@ -140,7 +143,8 @@ function Settings() {
                     name: activeEvent.name,
                     date: activeEvent.date,
                     time: activeEvent.time,
-                    location: activeEvent.location
+                    location: activeEvent.location,
+                    ticket_price: activeEvent.ticket_price
                 })
             })
 
@@ -297,6 +301,18 @@ function Settings() {
                                     id="location" 
                                     value={activeEvent.location} 
                                     onChange={e => setActiveEvent({...activeEvent, location: e.target.value})}
+                                    className="bg-white/5 border-white/10 text-white" 
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="price" className="text-gray-300">Ticket Price (GHS)</Label>
+                                <Input 
+                                    id="price" 
+                                    type="number"
+                                    step="0.01"
+                                    value={activeEvent.ticket_price} 
+                                    onChange={e => setActiveEvent({...activeEvent, ticket_price: e.target.value})}
                                     className="bg-white/5 border-white/10 text-white" 
                                 />
                             </div>

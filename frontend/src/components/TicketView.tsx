@@ -16,10 +16,12 @@ interface TicketProps {
   ticketId: string
   shortCode: string
   type: string
+  type: string
   eventDetails?: EventDetails
+  price?: string
 }
 
-export const TicketView = ({ name, ticketId, shortCode, type, eventDetails }: TicketProps) => {
+export const TicketView = ({ name, ticketId, shortCode, type, eventDetails, price }: TicketProps) => {
   // Default values if not provided
   const date = eventDetails?.date || "Dec 24, 2026"
   const time = eventDetails?.time || "12:00 PM"
@@ -53,7 +55,7 @@ export const TicketView = ({ name, ticketId, shortCode, type, eventDetails }: Ti
             </div>
             <div>
                  <div className="text-gray-400 text-xs uppercase tracking-wider mb-1">Cost</div>
-                 <div className="text-sm font-bold text-yellow-500">GHS 0.50</div>
+                 <div className="text-sm font-bold text-yellow-500">GHS {price || '0.50'}</div>
             </div>
              <div>
                  <div className="text-gray-400 text-xs uppercase tracking-wider mb-1">Ticket ID</div>

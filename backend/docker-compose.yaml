@@ -3,19 +3,30 @@ version: "3.8"
 services:
   web:
     build: .
-    command: gunicorn wakyefest_backend.wsgi:application --bind 0.0.0.0:8000
+    container_name: wakyefest_web
+    command: >
+      gunicorn wakyefest_backend.wsgi:application
+      --workers 2
+      --threads 2
+      --timeout 60
+      --graceful-timeout 30
+      --max-requests 1000
+      --max-requests-jitter 100
+      --bind 0.0.0.0:8000
+      --access-logfile -
+      --error-logfile -
+      --log-level info
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/health/"]
       interval: 30s
       timeout: 5s
       start_period: 30s
       retries: 3
-    volumes:
-      - .:/app
     expose:
       - "8000"
     env_file:
       - .env
     environment:
-      - DEBUG=0
+      DEBUG: "0"
+    restart: unless-stopped
       # Ensure DATABASE_URL is set in .env.prod or passed as an environment variable
